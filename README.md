@@ -1,25 +1,21 @@
-# setting_up_gophish
-Testing gophish
+# Setting up gophish
 
-Add gophish user and su to gophish
-```
-sudo useradd -m gophish
-sudo su - gophish
-```
-Download gophish
+Thanks to the developers this project: https://github.com/gophish/gophish
+
+
+Download gophish and extract to /opt:
 Look for your release at https://github.com/gophish/gophish/releases/
 ```
 wget https://github.com/gophish/gophish/releases/download/v0.1.2/gophish_linux_64bit.zip
-```
-Extract to /opt:
-```
 unzip gophish_linux_64bit.zip -d /opt
 cd /opt/gophish_linux_64bit
 ```
+
 Create self signed cert to enable https for admin web interface
 ```
 openssl req -newkey rsa:2048 -nodes -keyout gophish.key -x509 -days 365 -out gophish.crt
 ```
+
 Edit config.json file to enable ssl. I also wanted to listen on 0.0.0.0 rather than localhost so I can access from other systems.
 ```
 {
@@ -45,16 +41,22 @@ Edit config.json file to enable ssl. I also wanted to listen on 0.0.0.0 rather t
 }
 ```
 
-As root create log file path and change ownership to gophish user and write logs
+Add gophish user
+```
+useradd gophish
+```
+
+As root, create log file path and change ownership to gophish user. Change permisisons on /opt/gophish_linux_64bit/
 ```
 mkdir /var/log/gophish
 chown gophish.gophish /var/log/gophish
+chown -R gophish.gophish /opt/gophish_linux_64bit/
 ```
-As root give privileges to the gophish binary to open port 80
+Give privileges to the gophish binary to open port 80
 ```
 setcap 'cap_net_bind_service=+ep' /opt/gophish_linux_64bit/gophish
 ```
-gophish.service 
+create /usr/lib/systemd/system/gophish.service 
 ```
 [Unit]
 Description=Gophish is an open-source phishing toolkit 
@@ -78,8 +80,8 @@ Alias=gophish.service
 
 Start and enable gophish service
 ```
-sudo systemctl start gophish
-sudo systemctl enable gophish
+systemctl start gophish
+systemctl enable gophish
 ```
 
-Go to https://localhost:3333 login with admin/gophish. Change password immediately
+Visit https://localhost:3333 login with admin/gophish. Change password immediately
